@@ -5,7 +5,7 @@ _dayf := "'$(printf %02d)'"
 get year day:
     aocgofetch {{year}} {{day}} > inputs/{{day}}
 
-solve day:
+run day:
     mkdir -p bin && go build -o {{releasepath}} go-aoc-template && {{releasepath}} {{day}}
 
 test day:
