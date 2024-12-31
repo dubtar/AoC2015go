@@ -37,3 +37,7 @@ func ToInt(s string) int64 {
 	Check(err)
 	return val
 }
+
+func IsLowChar(c byte) bool {
+	return c >= 'a' && c <= 'z'
+}
