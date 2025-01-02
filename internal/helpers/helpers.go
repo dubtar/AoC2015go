@@ -3,6 +3,7 @@ package helpers
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 )
@@ -40,4 +41,39 @@ func ToInt(s string) int64 {
 
 func IsLowChar(c byte) bool {
 	return c >= 'a' && c <= 'z'
+}
+
+func Pow(base, exponent int64) int64 {
+	return int64(math.Pow(float64(base), float64(exponent)))
+
+}
+
+func Combinations[T any](set []T) (subsets [][]T) {
+	length := uint(len(set))
+
+	// Go through all possible combinations of objects
+	// from 1 (only first object in subset) to 2^length (all objects in subset)
+	for subsetBits := 1; subsetBits < (1 << length); subsetBits++ {
+		var subset []T
+
+		for object := uint(0); object < length; object++ {
+			// checks if object is contained in subset
+			// by checking if bit 'object' is set in subsetBits
+			if (subsetBits>>object)&1 == 1 {
+				// add object to subset
+				subset = append(subset, set[object])
+			}
+		}
+		// add subset to subsets
+		subsets = append(subsets, subset)
+	}
+	return subsets
+}
+
+func Multiply[T int | int64](list []T) T {
+	res := T(1)
+	for _, e := range list {
+		res *= e
+	}
+	return res
 }

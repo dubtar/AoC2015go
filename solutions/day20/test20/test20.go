@@ -7,10 +7,11 @@ import (
 	day20 "go-aoc-template/solutions/day20"
 )
 
-var lines = strings.Split(`example input`, "\n")
+var lines = strings.Split(`30470`, "\n")
 
 var (
-	partOneAnswer = "example answer"
+	partOneAnswer = "960" // 480, 240, 120, 60, 30, 15, 3, 5
+	// 98280 /2 = 49140 /2 = 24570 /2 = 12285 /3 = 4095/3=1365/3=455/5=91
 	partTwoAnswer = "example answer"
 )
 
