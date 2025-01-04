@@ -39,6 +39,10 @@ func ToInt(s string) int64 {
 	return val
 }
 
+func ToString(i int64) string {
+	return strconv.FormatInt(i, 10)
+}
+
 func IsLowChar(c byte) bool {
 	return c >= 'a' && c <= 'z'
 }
