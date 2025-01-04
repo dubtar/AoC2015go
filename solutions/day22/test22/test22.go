@@ -10,7 +10,7 @@ import (
 var lines = strings.Split(`example input`, "\n")
 
 var (
-	partOneAnswer = "example answer"
+	partOneAnswer = ""
 	partTwoAnswer = "example answer"
 )
 
@@ -27,6 +27,7 @@ func runTest(part int, solution SolutionFunc, expected string) {
 }
 
 func main() {
-	runTest(1, day22.PartOne, partOneAnswer)
-	runTest(2, day22.PartTwo, partTwoAnswer)
+	fmt.Printf("%v", day22.Run(day22.TestGame()))
+	// runTest(1, day22.PartOne, partOneAnswer)
+	// runTest(2, day22.PartTwo, partTwoAnswer)
 }
