@@ -7,10 +7,13 @@ import (
 	day23 "go-aoc-template/solutions/day23"
 )
 
-var lines = strings.Split(`example input`, "\n")
+var lines = strings.Split(`inc a
+jio a, +2
+tpl a
+inc a`, "\n")
 
 var (
-	partOneAnswer = "example answer"
+	partOneAnswer = "2 0"
 	partTwoAnswer = "example answer"
 )
 
