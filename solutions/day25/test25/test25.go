@@ -7,10 +7,10 @@ import (
 	day25 "go-aoc-template/solutions/day25"
 )
 
-var lines = strings.Split(`example input`, "\n")
+var lines = strings.Split(`To continue, please consult the code grid in the manual.  Enter the code at row 6, column 6.`, "\n")
 
 var (
-	partOneAnswer = "example answer"
+	partOneAnswer = "27995004"
 	partTwoAnswer = "example answer"
 )
 
