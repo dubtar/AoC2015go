@@ -7,10 +7,10 @@ import (
 	day01 "go-aoc-template/solutions/day01"
 )
 
-var lines = strings.Split(`example input`, "\n")
+var lines = strings.Split(`)())())`, "\n")
 
 var (
-	partOneAnswer = "example answer"
+	partOneAnswer = "-3"
 	partTwoAnswer = "example answer"
 )
 

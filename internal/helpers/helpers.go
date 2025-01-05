@@ -39,8 +39,8 @@ func ToInt(s string) int64 {
 	return val
 }
 
-func ToString(i int64) string {
-	return strconv.FormatInt(i, 10)
+func ToString[T any](i T) string {
+	return fmt.Sprint(i)
 }
 
 func IsLowChar(c byte) bool {
