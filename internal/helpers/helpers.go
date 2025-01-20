@@ -81,3 +81,10 @@ func Multiply[T int | int64](list []T) T {
 	}
 	return res
 }
+
+func Abs[T int | int64](x T) T {
+	if x < 0 {
+		return -x
+	}
+	return x
+}

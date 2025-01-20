@@ -1,30 +1,53 @@
 package day01
 
-import "fmt"
+import (
+	"strings"
+
+	h "go-aoc-template/internal/helpers"
+)
 
 func PartOne(lines []string) string {
-	floor := 0
-	for _, c := range lines[0] {
-		if c == '(' {
-			floor++
-		} else if c == ')' {
-			floor--
+	instructions := strings.Split(lines[0], ", ")
+	direction := '^'
+	pos := h.Coords{X: 0, Y: 0}
+	for _, instruction := range instructions {
+		switch instruction[0] {
+		case 'L':
+			// turn left
+			direction = h.TurnLeft(direction)
+		case 'R':
+			// turn right
+			direction = h.TurnRight(direction)
 		}
+		steps := h.ToInt(instruction[1:])
+		pos.Add(h.DirectionsHV[direction].Mul(steps))
 	}
-	return fmt.Sprint(floor)
+
+	return h.ToString(h.Abs(pos.X) + h.Abs(int64(pos.Y)))
 }
 
 func PartTwo(lines []string) string {
-	floor := 0
-	for i, c := range lines[0] {
-		if c == '(' {
-			floor++
-		} else if c == ')' {
-			floor--
+	instructions := strings.Split(lines[0], ", ")
+	direction := '^'
+	pos := h.Coords{X: 0, Y: 0}
+	visits := make(map[h.Coords]any)
+	for _, instruction := range instructions {
+		switch instruction[0] {
+		case 'L':
+			// turn left
+			direction = h.TurnLeft(direction)
+		case 'R':
+			// turn right
+			direction = h.TurnRight(direction)
 		}
-		if floor == -1 {
-			return fmt.Sprint(i + 1)
+		for range h.ToInt(instruction[1:]) {
+			pos.Add(h.DirectionsHV[direction])
+			if _, visited := visits[pos]; visited {
+				return h.ToString(h.Abs(pos.X) + h.Abs(int64(pos.Y)))
+			}
+			visits[pos] = struct{}{}
 		}
 	}
-	panic("")
+
+	return "Not found"
 }
