@@ -15,6 +15,11 @@ func (c *Coords) Add(other Coords) {
 }
 
 var DirectionsHV = map[rune]Coords{'^': {X: -1, Y: 0}, '>': {X: 0, Y: 1}, 'v': {X: 1, Y: 0}, '<': {X: 0, Y: -1}}
+var DirectionsUDLR = map[rune]Coords{
+	'U': {X: 0, Y: -1},
+	'D': {X: 0, Y: 1},
+	'L': {X: -1, Y: 0},
+	'R': {X: 1, Y: 0}}
 
 func TurnLeft(direction rune) rune {
 	switch direction {
