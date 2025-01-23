@@ -6,6 +6,7 @@ import (
 	"math"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func Check(e error) {
@@ -37,6 +38,17 @@ func ToInt(s string) int64 {
 	val, err := strconv.ParseInt(s, 10, 64)
 	Check(err)
 	return val
+}
+
+func ToInts(s []string) []int64 {
+	var vals []int64
+	for _, s := range s {
+		s := strings.Trim(s, " \n\t,")
+		if len(s) > 0 {
+			vals = append(vals, ToInt(s))
+		}
+	}
+	return vals
 }
 
 func ToString[T any](i T) string {

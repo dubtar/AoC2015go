@@ -7,10 +7,13 @@ import (
 	day04 "go-aoc-template/solutions/day04"
 )
 
-var lines = strings.Split(`example input`, "\n")
+var lines = strings.Split(`aaaaa-bbb-z-y-x-123[abxyz]
+a-b-c-d-e-f-g-h-987[abcde]
+not-a-real-room-404[oarel]
+totally-real-room-200[decoy]`, "\n")
 
 var (
-	partOneAnswer = "example answer"
+	partOneAnswer = "1514"
 	partTwoAnswer = "example answer"
 )
 
