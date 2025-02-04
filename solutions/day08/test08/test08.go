@@ -7,7 +7,10 @@ import (
 	day08 "go-aoc-template/solutions/day08"
 )
 
-var lines = strings.Split(`example input`, "\n")
+var lines = strings.Split(`rect 3x2
+rotate column x=1 by 1
+rotate row y=0 by 4
+rotate column x=1 by 1`, "\n")
 
 var (
 	partOneAnswer = "example answer"
