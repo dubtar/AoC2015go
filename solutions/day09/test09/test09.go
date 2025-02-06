@@ -7,11 +7,11 @@ import (
 	day09 "go-aoc-template/solutions/day09"
 )
 
-var lines = strings.Split(`example input`, "\n")
+var lines = strings.Split(`X(8x2)(3x3)ABCY`, "\n")
 
 var (
-	partOneAnswer = "example answer"
-	partTwoAnswer = "example answer"
+	partOneAnswer = "18"
+	partTwoAnswer = "20"
 )
 
 type SolutionFunc func([]string) string
