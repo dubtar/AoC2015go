@@ -7,10 +7,15 @@ import (
 	day10 "go-aoc-template/solutions/day10"
 )
 
-var lines = strings.Split(`example input`, "\n")
+var lines = strings.Split(`value 5 goes to bot 2
+bot 2 gives low to bot 1 and high to bot 0
+value 3 goes to bot 1
+bot 1 gives low to output 1 and high to bot 0
+bot 0 gives low to output 2 and high to output 0
+value 2 goes to bot 2`, "\n")
 
 var (
-	partOneAnswer = "example answer"
+	partOneAnswer = "0"
 	partTwoAnswer = "example answer"
 )
 
