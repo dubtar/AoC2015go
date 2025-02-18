@@ -100,3 +100,12 @@ func Abs[T int | int64](x T) T {
 	}
 	return x
 }
+
+func BitCount[T int | int64](x T) (result T) {
+	result = 0
+	for x != 0 {
+		result += x & 1
+		x >>= 1
+	}
+	return
+}
