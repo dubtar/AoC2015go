@@ -1,68 +1,81 @@
 package day15
 
 import (
-	"fmt"
 	h "go-aoc-template/internal/helpers"
-	"math"
-	"strings"
+
+	"regexp"
 )
 
-type Ingredient []int64
-
-func NewIngredient(line string) Ingredient {
-	vals := strings.Split(strings.Split(line, ": ")[1], ", ")
-
-	var result Ingredient
-	for _, v := range vals {
-		result = append(result, h.ToInt(strings.Split(v, " ")[1]))
-	}
-
-	return result
+type Disk struct {
+	period        int64
+	startPosition int64
 }
 
-func parse(lines []string) []Ingredient {
-	ings := make([]Ingredient, 0)
-	for _, line := range lines {
-		ings = append(ings, NewIngredient(line))
+func ParseDisks(lines []string) []Disk {
+	r := regexp.MustCompile(`Disc #. has (\d+) positions; at time=0, it is at position (\d+).`)
+	disks := []Disk{}
+	for i, line := range lines {
+		matches := r.FindStringSubmatch(line)
+		disk := Disk{period: h.ToInt(matches[1]), startPosition: h.ToInt(matches[2])}
+		disk.startPosition = (disk.startPosition + int64(i) + 1) % disk.period
+		disks = append(disks, disk)
 	}
-
-	return ings
+	return disks
 }
 
 func PartOne(lines []string) string {
-	ings := parse(lines)
-	limit := int64(100)
-    target_calories := int64(500)
-	best := int64(0)
-	best2 := int64(0)
-	var ings_len int = len(ings)
-	for i := int64(0); float64(i) <= math.Pow(float64(limit), float64(ings_len-1)); i++ {
-        cur := i
-		scores := make([]int64, 5)
-		used := int64(0)
-		for j := 0; j < ings_len; j++ {
-			q := cur % limit
-			if j == ings_len-1 {
-				q = limit - used
-            }
-            for k := 0; k < 5; k++ {
-                scores[k] += ings[j][k] * q
-            }
-            used += q
-            cur /= limit
+	disks := ParseDisks(lines)
+	best := 0
+	for i := disks[0].period - disks[0].startPosition; true; i += disks[0].period {
+		found := true
+		last := 1
+		for _, disk := range disks[1:] {
+			if (i+disk.startPosition)%disk.period != 0 {
+				found = false
+				break
+			}
+			last += 1
 		}
-        score := int64(1)
-        for k := 0; k < len(scores) - 1; k++ {
-            score *= max(0, scores[k])
-        }
-        best = max(best, score)
-        if scores[len(scores)-1] == target_calories {
-            best2 = max(best2, score)
-        }
+		if found {
+			return h.ToString(i)
+		}
+		if last > best {
+			print(i, ": ", last, "\n")
+			for _, disk := range disks {
+				print((disk.startPosition+int64(i))%disk.period, " ")
+			}
+			print("\n")
+			best = last
+		}
 	}
-    return fmt.Sprint(best, best2)
+	return "Failed"
 }
 
 func PartTwo(lines []string) string {
-	return "Look before"
+	disks := ParseDisks(lines)
+	disks = append(disks, Disk{period: 11, startPosition: int64(len(disks) + 1)})
+	best := 0
+	for i := disks[0].period - disks[0].startPosition; true; i += disks[0].period {
+		found := true
+		last := 1
+		for _, disk := range disks[1:] {
+			if (i+disk.startPosition)%disk.period != 0 {
+				found = false
+				break
+			}
+			last += 1
+		}
+		if found {
+			return h.ToString(i)
+		}
+		if last > best {
+			print(i, ": ", last, "\n")
+			for _, disk := range disks {
+				print((disk.startPosition+int64(i))%disk.period, " ")
+			}
+			print("\n")
+			best = last
+		}
+	}
+	return "Failed"
 }

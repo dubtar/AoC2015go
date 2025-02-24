@@ -7,12 +7,12 @@ import (
 	day15 "go-aoc-template/solutions/day15"
 )
 
-var lines = strings.Split(`Butterscotch: capacity -1, durability -2, flavor 6, texture 3, calories 8
-Cinnamon: capacity 2, durability 3, flavor -2, texture -1, calories 3`, "\n")
+var lines = strings.Split(`Disc #1 has 5 positions; at time=0, it is at position 4.
+Disc #2 has 2 positions; at time=0, it is at position 1.`, "\n")
 
 var (
-	partOneAnswer = "62842880"
-	partTwoAnswer = "57600000"
+	partOneAnswer = "5"
+	partTwoAnswer = "example answer"
 )
 
 type SolutionFunc func([]string) string

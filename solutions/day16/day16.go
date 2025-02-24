@@ -1,83 +1,61 @@
 package day16
 
-import (
-	h "go-aoc-template/internal/helpers"
-	"strings"
-)
+// import (
+//     h "go-aoc-template/internal/helpers"
+// )
 
-func parse(lines []string) map[string]map[string]int64 {
-	result := make(map[string]map[string]int64)
-	for _, line := range lines {
-		parts := strings.SplitN(line, ": ", 2)
-		name := strings.Split(parts[0], " ")[1]
-		result[name] = make(map[string]int64)
-		for _, part := range strings.Split(parts[1], ", ") {
-			parts := strings.Split(part, ": ")
-			result[name][parts[0]] = h.ToInt(parts[1])
+func PartOne(lines []string) string {
+	Target := 272
+	input := lines[0]
+	if len(input) < 15 {
+		Target = 20 // test
+	}
+	return Run(input, Target)
+}
+func Run(input string, Target int) string {
+	data := make([]byte, len(input), Target)
+	for i := 0; i < len(input); i++ {
+		data[i] = input[i]
+	}
+	for len(data) < Target {
+		prevLen := len(data)
+		data = append(data, '0')
+		for i := 0; i < prevLen; i++ {
+			v := data[prevLen-i-1]
+			if v == '1' {
+				data = append(data, '0')
+			} else {
+				data = append(data, '1')
+			}
+			if len(data) >= Target {
+				break
+			}
+		}
+	}
+	// for _, v := range data {
+	// 	print(string(v))
+	// }
+	// print('\n')
+	checksum := buildCheckSum(data)
+	for len(checksum)%2 == 0 {
+		checksum = buildCheckSum(checksum)
+	}
+	return string(checksum)
+}
+
+func buildCheckSum(data []byte) []byte {
+	result := make([]byte, len(data)/2)
+	for i := 0; i < len(data); i += 2 {
+		if data[i] == data[i+1] {
+			result[i/2] = '1'
+		} else {
+			result[i/2] = '0'
 		}
 	}
 	return result
 }
 
-var target = map[string]int64{
-	"children":    3,
-	"cats":        7,
-	"samoyeds":    2,
-	"pomeranians": 3,
-	"akitas":      0,
-	"vizslas":     0,
-	"goldfish":    5,
-	"trees":       3,
-	"cars":        2,
-	"perfumes":    1,
-}
-
-func PartOne(lines []string) string {
-	aunts := parse(lines)
-	for name, aunt := range aunts {
-		found := true
-		for key, value := range aunt {
-			if target[key] != value {
-				found = false
-				break
-			}
-		}
-		if found {
-			return name
-		}
-	}
-
-	return "Not found"
-}
-
 func PartTwo(lines []string) string {
-	aunts := parse(lines)
-
-	for name, aunt := range aunts {
-		found := true
-		for key, value := range aunt {
-			switch key {
-			case "cats", "trees":
-				if target[key] >= value {
-					found = false
-					break
-				}
-			case "pomeranians", "goldfish":
-				if target[key] <= value {
-					found = false
-					break
-				}
-			default:
-				if target[key] != value {
-					found = false
-					break
-				}
-			}
-		}
-		if found {
-			return name
-		}
-	}
-
-	return "Not found"
+	target := 35651584
+	return Run(lines[0], target)
 }
