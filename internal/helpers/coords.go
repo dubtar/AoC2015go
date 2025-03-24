@@ -9,9 +9,15 @@ func (c Coords) Mul(steps int64) Coords {
 	return Coords{X: c.X * steps, Y: c.Y * steps}
 }
 
+// Добавляет координаты к текущим
 func (c *Coords) Add(other Coords) {
 	c.X += other.X
 	c.Y += other.Y
+}
+
+// оператор сложения - возвращает новые координаты
+func (c *Coords) Plus(other Coords) Coords {
+	return Coords{X: c.X + other.X, Y: c.Y + other.Y}
 }
 
 var DirectionsHV = map[rune]Coords{'^': {X: -1, Y: 0}, '>': {X: 0, Y: 1}, 'v': {X: 1, Y: 0}, '<': {X: 0, Y: -1}}

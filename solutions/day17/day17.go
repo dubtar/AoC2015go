@@ -1,43 +1,76 @@
 package day17
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	h "go-aoc-template/internal/helpers"
-	"strconv"
+
+	"github.com/idsulik/go-collections/v2/deque"
 )
 
-func find(target int64, conts []int64, path int, paths map[int]int) int {
-	if len(conts) == 0 || target < 0 {
-		return 0
-	}
-	res1 := find(target, conts[1:], path, paths)
-	res2 := 0
-	if conts[0] == target {
-		res2 = 1
-		paths[path+1] += 1
-	} else {
-		res2 = find(target-conts[0], conts[1:], path+1, paths)
-	}
-	return res1 + res2
+type Data struct {
+	position h.Coords
+	path string
 }
-func PartOneTargeted(lines []string, target int64) (int, int) {
-	cont := make([]int64, len(lines))
-	for i, line := range lines {
-		cont[i] = h.ToInt(line)
-	}
-	paths := make(map[int]int)
-	res := find(target, cont, 0, paths)
-	minKey := len(cont)
-	for k := range paths {
-		minKey = min(minKey, k)
-	}
-	return res, paths[minKey]
-}
+
 func PartOne(lines []string) string {
-	res, _ := PartOneTargeted(lines, 150)
-	return strconv.Itoa(res)
+	key := lines[0]
+	Min := int64(1)
+	Max := int64(4)
+	Target := h.Coords{X: Max, Y: Max}
+	Dirs := []rune{'U', 'D', 'L', 'R'}
+	queue := deque.New[Data](-1)
+	queue.PushBack(Data{position: h.Coords{X: Min, Y: Min}, path: ""})
+	for !queue.IsEmpty() {
+		cur, _ := queue.PopFront()
+		if cur.position == Target {
+			return cur.path
+		}
+		hash := md5.Sum([]byte(key + cur.path))
+		hex := hex.EncodeToString(hash[:])
+		for i, val := range hex[:4] {
+			if val < 'b' {
+				continue
+			}
+			dir := Dirs[i]
+			nextPos := cur.position.Plus(h.DirectionsUDLR[dir])
+			if nextPos.X < Min || nextPos.Y < Min || nextPos.X > Max || nextPos.Y > Max {
+				continue
+			}
+			queue.PushBack(Data{nextPos, cur.path+string(dir)})
+		}
+	}
+	return "Not found"
 }
 
 func PartTwo(lines []string) string {
-	_, res := PartOneTargeted(lines, 150)
-	return strconv.Itoa(res)
+	key := lines[0]
+	Min := int64(1)
+	Max := int64(4)
+	Target := h.Coords{X: Max, Y: Max}
+	Dirs := []rune{'U', 'D', 'L', 'R'}
+	queue := deque.New[Data](-1)
+	queue.PushBack(Data{position: h.Coords{X: Min, Y: Min}, path: ""})
+	longest := Data{}
+	for !queue.IsEmpty() {
+		cur, _ := queue.PopFront()
+		if cur.position == Target {
+			longest = cur
+			continue
+		}
+		hash := md5.Sum([]byte(key + cur.path))
+		hex := hex.EncodeToString(hash[:])
+		for i, val := range hex[:4] {
+			if val < 'b' {
+				continue
+			}
+			dir := Dirs[i]
+			nextPos := cur.position.Plus(h.DirectionsUDLR[dir])
+			if nextPos.X < Min || nextPos.Y < Min || nextPos.X > Max || nextPos.Y > Max {
+				continue
+			}
+			queue.PushBack(Data{nextPos, cur.path+string(dir)})
+		}
+	}
+	return h.ToString(len(longest.path))
 }
