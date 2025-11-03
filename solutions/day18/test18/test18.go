@@ -7,15 +7,11 @@ import (
 	day18 "go-aoc-template/solutions/day18"
 )
 
-var lines = strings.Split(`.#.#.#
-...##.
-#....#
-..#...
-#.#..#
-####..`, "\n")
+var lines = strings.Split(`.^^.^.^^^^
+`, "\n")
 
 var (
-	partOneAnswer = "4"
+	partOneAnswer = "38"
 	partTwoAnswer = "17"
 )
 
