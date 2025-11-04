@@ -2,105 +2,110 @@ package day19
 
 import (
 	"fmt"
-	h "go-aoc-template/internal/helpers"
+	"slices"
 	"strconv"
-	"strings"
 )
 
-type Rules map[string][]string
-
-var replaces = map[string]string{}
-var nextVar = 'f'
-
-func repl(s string) string {
-	var v string
-	if v, ok := replaces[s]; ok {
-		return v
+func PartOne(lines []string) string {
+	num, _ := strconv.Atoi(lines[0])
+	arr := make([]int, num)
+	for i := range num {
+		arr[i] = 1
 	}
-	if len(s) == 1 {
-		v = s
-	} else {
-		v = string(nextVar)
-		nextVar++
-	}
-	replaces[s] = v
-	return v
-}
-func replS(s string) string {
-	val := ""
-	for i := 0; i < len(s); i++ {
-		if i < len(s)-1 && h.IsLowChar(s[i+1]) {
-			val += repl(s[i : i+2])
-			i++
-		} else {
-			val += repl(string(s[i]))
+	cur := 0
+	i := cur
+	isStealing := true
+	for num > 1 {
+		i++
+		if i == len(arr) {
+			i = 0
 		}
-	}
-	return val
-}
-func parse(lines []string) (rules Rules, molecule string) {
-	isRules := true
-	rules = Rules{}
-	for _, line := range lines {
-		if line == "" {
-			isRules = false
+		if arr[i] == 0 {
 			continue
 		}
-		if isRules {
-			parts := strings.Split(line, " => ")
-			key := repl(parts[0])
-			val := replS(parts[1])
-			rules[key] = append(rules[key], val)
+		if isStealing {
+			// забираем
+			arr[cur] += arr[i]
+			arr[i] = 0
+			num--
+			isStealing = false
 		} else {
-			molecule = replS(line)
-			return
+			cur = i
+			isStealing = true
 		}
 	}
-	return
+
+	return strconv.Itoa(cur + 1)
 }
 
-func PartOne(lines []string) string {
-	rules, source := parse(lines)
-	isTest := len(source) < 10
+type chainedArray[K any] struct {
+	partCapacity int
+	parts [][]K
+}
 
-	results := make(map[string]any)
-	for i := 0; i < len(source); i++ {
-		for k, subs := range rules {
-			if i+len(k) > len(source) {
-				continue
-			}
-			if source[i:i+len(k)] == k {
-				for _, s := range subs {
-					v := source[:i] + s + source[i+len(k):]
-					results[v] = struct{}{}
-					if isTest {
-						fmt.Println(v)
-					}
-				}
-			}
-		}
+func NewChainedArray[K any](partCapacity int) chainedArray[K] {
+	return chainedArray[K]{
+		partCapacity: partCapacity,
+		parts:  make([][]K, 0, 100),
 	}
-	return strconv.Itoa(len(results))
+}
+func (ca *chainedArray[K]) Get(index int) K {
+	for _, part :=  range ca.parts {
+		if len(part) > index {
+			return part[index]
+		}
+		index -= len(part)
+	}
+	panic("Index is out of bounds")
+}
+
+func (ca *chainedArray[K]) Append(value K) {
+	if len(ca.parts) > 0 && len(ca.parts[len(ca.parts)-1]) < ca.partCapacity {
+		ca.parts[len(ca.parts)-1] = append(ca.parts[len(ca.parts)-1], value)
+		return
+	}
+	newPart := make([]K, 1, ca.partCapacity)
+	newPart[0] = value
+	ca.parts = append(ca.parts, newPart)
+}
+
+func (ca *chainedArray[K]) Delete(index int) {
+	for i, part :=  range ca.parts {
+		if len(part) > index {
+			part = slices.Delete(part, index, index+1)
+			if len(part) == 0 {
+				ca.parts = slices.Delete(ca.parts, i, i+1)
+			} else {
+				ca.parts[i] = part
+			}
+			return
+		}
+		index -= len(part)
+	}
+	panic("Index is out of bounds")
 }
 
 func PartTwo(lines []string) string {
-	_, target := parse(lines)
-	_, ok := replaces["Rn"]
-	if !ok { // test
-		return strconv.Itoa(len(target) - 1)
+	num, _ := strconv.Atoi(lines[0])
+	t := 100
+	if num < 100 {
+		t = 2
 	}
-	rn, y, ar := replaces["Rn"][0], replaces["Y"][0], replaces["Ar"][0]
-	rns, ys, ars := 0, 0, 0
-	for i := 0; i < len(target); i++ {
-		c := target[i]
-		switch c {
-		case rn:
-			rns++
-		case y:
-			ys++
-		case ar:
-			ars++
+	arr := NewChainedArray[int](t)
+	for i := range num {
+		arr.Append(i + 1)
+	}
+	cur := 0
+	for num > 1 {
+		target := (cur + num / 2) % num
+		arr.Delete(target)
+		num--
+		fmt.Printf("\r n=%v", num)
+		if target > cur {
+			cur++
 		}
+		cur = cur % num
 	}
-	return strconv.Itoa(len(target) - rns - ys*2 - ars - 1)
+
+	return strconv.Itoa(arr.Get(0))
 }

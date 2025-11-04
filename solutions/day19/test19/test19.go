@@ -7,19 +7,11 @@ import (
 	day19 "go-aoc-template/solutions/day19"
 )
 
-var lines = strings.Split(`H => HO
-H => HO
-O => OH
-O => HH
-e => H
-e => O
-
-HOHOHO
-`, "\n") // HOH
+var lines = strings.Split(`5`, "\n") // HOH
 
 var (
-	partOneAnswer = "7"
-	partTwoAnswer = "6"
+	partOneAnswer = "3"
+	partTwoAnswer = "2"
 )
 
 type SolutionFunc func([]string) string
