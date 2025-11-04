@@ -2,7 +2,8 @@ package day19
 
 import (
 	"fmt"
-	"slices"
+	h "go-aoc-template/internal/helpers"
+	"math"
 	"strconv"
 )
 
@@ -38,66 +39,20 @@ func PartOne(lines []string) string {
 	return strconv.Itoa(cur + 1)
 }
 
-type chainedArray[K any] struct {
-	partCapacity int
-	parts [][]K
-}
-
-func NewChainedArray[K any](partCapacity int) chainedArray[K] {
-	return chainedArray[K]{
-		partCapacity: partCapacity,
-		parts:  make([][]K, 0, 100),
-	}
-}
-func (ca *chainedArray[K]) Get(index int) K {
-	for _, part :=  range ca.parts {
-		if len(part) > index {
-			return part[index]
-		}
-		index -= len(part)
-	}
-	panic("Index is out of bounds")
-}
-
-func (ca *chainedArray[K]) Append(value K) {
-	if len(ca.parts) > 0 && len(ca.parts[len(ca.parts)-1]) < ca.partCapacity {
-		ca.parts[len(ca.parts)-1] = append(ca.parts[len(ca.parts)-1], value)
-		return
-	}
-	newPart := make([]K, 1, ca.partCapacity)
-	newPart[0] = value
-	ca.parts = append(ca.parts, newPart)
-}
-
-func (ca *chainedArray[K]) Delete(index int) {
-	for i, part :=  range ca.parts {
-		if len(part) > index {
-			part = slices.Delete(part, index, index+1)
-			if len(part) == 0 {
-				ca.parts = slices.Delete(ca.parts, i, i+1)
-			} else {
-				ca.parts[i] = part
-			}
-			return
-		}
-		index -= len(part)
-	}
-	panic("Index is out of bounds")
-}
-
-func PartTwo(lines []string) string {
+func PartTwo2(lines []string) string {
+	// моё решение
 	num, _ := strconv.Atoi(lines[0])
-	t := 100
+	t := 10000
 	if num < 100 {
 		t = 2
 	}
-	arr := NewChainedArray[int](t)
+	arr := h.NewChainedArray[int](t)
 	for i := range num {
 		arr.Append(i + 1)
 	}
 	cur := 0
 	for num > 1 {
-		target := (cur + num / 2) % num
+		target := (cur + num/2) % num
 		arr.Delete(target)
 		num--
 		fmt.Printf("\r n=%v", num)
@@ -108,4 +63,39 @@ func PartTwo(lines []string) string {
 	}
 
 	return strconv.Itoa(arr.Get(0))
+}
+
+func PartTwo(lines []string) string {
+	// подсмотренное решение
+	num, _ := strconv.Atoi(lines[0])
+	arr := make([]int, num)
+	for i := range num {
+		arr[i] = i + 1
+	}
+
+	for len(arr) > 1 {
+		num := len(arr)
+		eliminated := 0
+		limit := int(math.Ceil(float64(num) / 3))
+		for i := range limit {
+			across := i + eliminated + (num / 2)
+			arr[across] = 0
+			num -= 1
+			eliminated += 1
+		}
+		result := make([]int, 0, num)
+		for _, c := range arr[limit:] {
+			if c != 0 {
+				result = append(result, c)
+			}
+		}
+		for _, c := range arr[:limit] {
+			if c != 0 {
+				result = append(result, c)
+			}
+		}
+		arr = result
+	}
+
+	return strconv.Itoa(arr[0])
 }
