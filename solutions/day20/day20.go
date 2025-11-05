@@ -1,125 +1,71 @@
 package day20
 
 import (
-	"fmt"
-	h "go-aoc-template/internal/helpers"
+	// h "go-aoc-template/internal/helpers"
+	"slices"
+	"strconv"
+	"strings"
 )
 
-var primes = []int64{2, 3, 5, 7, 11, 13}
-
-func PartOne(lines []string) string {
-	target := h.ToInt(lines[0]) / 10
-	// fmt.Println("Primes", primes)
-	progress := int64(100)
-	maxs := int64(0)
-	maxi := maxs
-	for i := primes[len(primes)-1] + 1; ; i++ {
-		ds := sumOfDividers(i, primes, false)
-		if ds > target {
-			return fmt.Sprint(i)
-		}
-		if ds == 1+i {
-			primes = append(primes, i)
-		}
-		if i < 20 {
-			fmt.Println(i, ":", ds)
-		}
-		if ds > maxs {
-			maxs = ds
-			maxi = i
-		}
-		if i%progress == 0 {
-			progress *= 10
-			fmt.Println(maxs, "at", maxi)
-		}
-	}
+type pair struct {
+	start int
+	end   int
 }
 
-func sumOfDividers(i int64, primes []int64, limit50 bool) int64 {
-	dels := []int64{}
-	ii := i
-	for _, p := range primes {
-		for ii%p == 0 {
-			dels = append(dels, p)
-			ii /= p
-		}
-		if ii == 1 {
-			break
-		}
+func PartOne(lines []string) string {
+	bans := make([]pair, 0, len(lines))
+	for _, line := range lines {
+		p := pair{}
+		ind := strings.Index(line, "-")
+		p.start, _ = strconv.Atoi(line[0:ind])
+		p.end, _ = strconv.Atoi(line[ind+1:])
+		bans = append(bans, p)
 	}
-	if ii > 1 {
-		dels = append(dels, ii)
-	}
-	visited := map[int64]any{}
-	sum := int64(1)
-	for _, comb := range h.Combinations(dels) {
-		mult := h.Multiply(comb)
-		if limit50 && mult < i/50 {
-			continue
+	slices.SortFunc(bans, func(a, b pair) int {
+		if a.start != b.start {
+			return a.start - b.start
 		}
-		if _, was := visited[mult]; !was {
-			visited[mult] = struct{}{}
-			sum += mult
+		return a.end - b.end
+	})
+	lastBan := bans[0].end
+	for _, ban := range bans[1:] {
+		if ban.start > lastBan+1 {
+			return strconv.Itoa(lastBan + 1)
 		}
+		lastBan = max(lastBan, ban.end)
 	}
-	return sum
+	return "failed"
 }
 
 func PartTwo(lines []string) string {
-	target := h.ToInt(lines[0]) / 11
-
-	maxs := int64(0)
-	maxi := maxs
-	for i := primes[len(primes)-1] + 1; ; i++ {
-		ds := sumOfDividers(i, primes, true)
-		if ds > target {
-			return fmt.Sprint(i)
-		}
-		if i < 20 {
-			fmt.Println(i, ":", ds)
-		}
-		if ds > maxs {
-			maxs = ds
-			maxi = i
-		}
-		if i%100000 == 0 {
-			fmt.Println(maxs, "at", maxi)
-		}
+	bans := make([]pair, 0, len(lines))
+	maxValue := 1 << 32
+	if len(lines) < 10 {
+		maxValue = 10
 	}
-}
-
-func sumOfDiviersNaive(i int64) int64 { // 5 mins
-	sum := int64(1)
-	for d := int64(2); d <= i/2; d++ {
-		if i%d == 0 {
-			sum += d
-		}
+	for _, line := range lines {
+		p := pair{}
+		ind := strings.Index(line, "-")
+		p.start, _ = strconv.Atoi(line[0:ind])
+		p.end, _ = strconv.Atoi(line[ind+1:])
+		bans = append(bans, p)
 	}
-	return sum + i
-}
-
-func sumOfDividers2Naive(i int64, primes []int64) int64 { // 5 mins also
-	dels := []int64{}
-	for _, p := range primes {
-		for i%p == 0 {
-			dels = append(dels, p)
-			i /= p
+	slices.SortFunc(bans, func(a, b pair) int {
+		if a.start != b.start {
+			return a.start - b.start
 		}
-		if i == 1 {
-			break
+		return a.end - b.end
+	})
+	result := 0
+	lastBan := bans[0].end
+	for _, ban := range bans[1:] {
+		if ban.start > lastBan+1 {
+			result += ban.start - lastBan - 1
 		}
+		lastBan = max(lastBan, ban.end)
 	}
-	if i > 1 {
-		dels = append(dels, i)
+	if lastBan < maxValue - 1 {
+		result += maxValue - lastBan - 1
 	}
-	visited := map[int64]any{}
-	sum := int64(1)
-	for _, comb := range h.Combinations(dels) {
-		mult := h.Multiply(comb)
-		if _, was := visited[mult]; !was {
-			visited[mult] = struct{}{}
-			sum += mult
-		}
-	}
-	return sum
+	return strconv.Itoa(result)
 }

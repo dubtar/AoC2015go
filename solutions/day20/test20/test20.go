@@ -7,12 +7,13 @@ import (
 	day20 "go-aoc-template/solutions/day20"
 )
 
-var lines = strings.Split(`30470`, "\n")
+var lines = strings.Split(`5-8
+0-2
+4-7`, "\n")
 
 var (
-	partOneAnswer = "960" // 480, 240, 120, 60, 30, 15, 3, 5
-	// 98280 /2 = 49140 /2 = 24570 /2 = 12285 /3 = 4095/3=1365/3=455/5=91
-	partTwoAnswer = "example answer"
+	partOneAnswer = "3"
+	partTwoAnswer = "2"
 )
 
 type SolutionFunc func([]string) string
