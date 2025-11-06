@@ -2,107 +2,157 @@ package day21
 
 import (
 	"fmt"
+	"slices"
+	"strconv"
 	"strings"
-
-	h "go-aoc-template/internal/helpers"
+	// h "go-aoc-template/internal/helpers"
 )
 
-type Item struct {
-	cost   int
-	damage int
-	armor  int
-}
-type Person struct {
-	Item
-	hitpoint int
-}
-
-func (p *Person) Add(item Item) {
-	p.armor += item.armor
-	p.cost += item.cost
-	p.damage += item.damage
-}
-
-func (p *Person) Remove(item Item) {
-	p.armor -= item.armor
-	p.cost -= item.cost
-	p.damage -= item.damage
-}
-
-var weapons = []Item{{8, 4, 0}, {10, 5, 0}, {25, 6, 0}, {40, 7, 0}, {74, 8, 0}}
-var armors = []Item{{0, 0, 0}, {13, 0, 1}, {31, 0, 2}, {53, 0, 3}, {75, 0, 4}, {102, 0, 5}}
-var rings = []Item{{20, 0, 1}, {25, 1, 0}, {40, 0, 2}, {50, 2, 0}, {80, 0, 3}, {100, 3, 0}}
-
-func fight(person Person, boss Person) bool {
-	for {
-		boss.hitpoint -= max(1, person.damage-boss.armor)
-		if boss.hitpoint <= 0 {
-			return true
-		}
-		person.hitpoint -= max(1, boss.damage-person.armor)
-		if person.hitpoint <= 0 {
-			return false
-		}
-	}
-}
-
-var mostCost int = 0
-
 func PartOne(lines []string) string {
-	boss := Person{}
+	value := strings.Split("abcdefgh", "")
+	isDebug := false
+	if len(lines) < 10 {
+		isDebug = true
+		value = strings.Split("abcde", "")
+	}
 	for _, line := range lines {
-		if strings.HasPrefix(line, "Hit Points:") {
-			boss.hitpoint = int(h.ToInt(line[len("Hit Points: "):]))
-		} else if strings.HasPrefix(line, "Damage: ") {
-			boss.damage = int(h.ToInt(line[len("Damage: "):]))
-		} else if strings.HasPrefix(line, "Armor:") {
-			boss.armor = int(h.ToInt(line[len("Armor: "):]))
+		parts := strings.Split(line, " ")
+		if len(parts) == 0 {
+			continue
 		}
-	}
-	bestCost := 1000
-	person := Person{hitpoint: 100}
-	for _, weapon := range weapons {
-		person.Add(weapon)
-		for _, armor := range armors {
-			person.Add(armor)
-			if fight(person, boss) {
-				// fmt.Println("Win with weapon", weapon.cost, "and armor", armor.cost)
-				bestCost = min(bestCost, person.cost)
-			} else {
-				// fmt.Println("Loose with weapon", weapon.cost, "and armor", armor.cost)
-				mostCost = max(mostCost, person.cost)
+		switch parts[0] {
+		case "swap":
+			indLeft, indRight := 0, 0
+			switch parts[1] {
+			case "position":
+				indLeft, _ = strconv.Atoi(parts[2])
+				indRight, _ = strconv.Atoi(parts[5])
+			case "letter":
+				indLeft = slices.Index(value, parts[2])
+				indRight = slices.Index(value, parts[5])
 			}
-			for r1, ring := range rings {
-				person.Add(ring)
-				if fight(person, boss) {
-					// fmt.Println("Win with weapon", weapon.cost, ", armor", armor.cost, "and ring", ring.cost)
-					bestCost = min(bestCost, person.cost)
-				} else {
-					// fmt.Println("Loose with weapon", weapon.cost, ", armor", armor.cost, "and ring", ring.cost)
-					mostCost = max(mostCost, person.cost)
-				}
-				for r2 := r1 + 1; r2 < len(rings); r2++ {
-					ring2 := rings[r2]
-					person.Add(ring2)
-					if fight(person, boss) {
-						// fmt.Println("Win with weapon", weapon.cost, ", armor", armor.cost, "and rings", ring.cost, ring2.cost)
-						bestCost = min(bestCost, person.cost)
-					} else {
-						// fmt.Println("Loose with weapon", weapon.cost, ", armor", armor.cost, "and rinsg", ring.cost, ring2.cost)
-						mostCost = max(mostCost, person.cost)
-					}
-					person.Remove(ring2)
-				}
-				person.Remove(ring)
-			}
-			person.Remove(armor)
-		}
-		person.Remove(weapon)
 
+			value[indLeft], value[indRight] = value[indRight], value[indLeft]
+		case "reverse":
+			indLeft, _ := strconv.Atoi(parts[2])
+			indRight, _ := strconv.Atoi(parts[4])
+			for indLeft < indRight {
+				value[indLeft], value[indRight] = value[indRight], value[indLeft]
+				indLeft++
+				indRight--
+			}
+		case "rotate":
+			ind := 0
+			switch parts[1] {
+			case "left":
+				ind, _ = strconv.Atoi(parts[2])
+			case "right":
+				ind, _ = strconv.Atoi(parts[2])
+				ind = len(value) - ind
+			case "based":
+				ind = slices.Index(value, parts[6])
+				if ind >= 4 {
+					ind += 1
+				}
+				ind++
+				ind = len(value) - (ind % len(value))
+			}
+			value = append(value[ind:], value[:ind]...)
+		case "move":
+			indLeft, _ := strconv.Atoi(parts[2])
+			indRight, _ := strconv.Atoi(parts[5])
+			dir := 1
+			if indLeft > indRight {
+				dir = -1
+			}
+			l := value[indLeft]
+			for ; indLeft != indRight; indLeft += dir {
+				value[indLeft] = value[indLeft+dir]
+			}
+			value[indRight] = l
+		}
+		if isDebug {
+			fmt.Printf("%s: %s\n", line, strings.Join(value, ""))
+		}
 	}
-	return fmt.Sprint(bestCost)
+	return strings.Join(value, "")
 }
 
 func PartTwo(lines []string) string {
-	return fmt.Sprint(mostCost)
+	value := strings.Split("fbgdceah", "")
+	// 01234567 : 0 -> 1 ( 0 + 0 1)
+	// b in aBcdefg : 1 -> 3 (1 + 1 + 1)
+	// c in 01c34567 : 2 -> 5 ( 2 + 2 + 1)
+	// d in 012d4567 : 3 -> 7 (7=3 + 3 + 1)
+	// e in 0123e567 : 4 -> 2 (10=4+4 + 2)
+	// f in 01234f67 : 5 -> 4 (12=5 + 5 + 2)
+	// g in 012345g7 : 6 -> 6 (14=6 + 6 + 2)
+	// h in 0123456h : 7 -> 0 (16=7 + 7 + 2)
+	//
+	// 01234 : 0 -> 1
+	// 1 -> 3
+	// 2 -> 0 (5= 2 + 2 + 1)
+	// 3 -> 2
+	// 4 -> 0 (10=4 + 4 + 2)
+	rotates := []int{7, 0, 4, 1, 5, 2, 6, 3}
+	if len(lines) < 10 {
+		value = strings.Split("decab", "")
+		rotates = []int{4, 0, 3, 1, -1}
+	}
+	for _, line := range slices.Backward(lines) {
+		parts := strings.Split(line, " ")
+		if len(parts) == 0 {
+			continue
+		}
+		switch parts[0] {
+		case "swap":
+			indLeft, indRight := 0, 0
+			switch parts[1] {
+			case "position":
+				indLeft, _ = strconv.Atoi(parts[2])
+				indRight, _ = strconv.Atoi(parts[5])
+			case "letter":
+				indLeft = slices.Index(value, parts[2])
+				indRight = slices.Index(value, parts[5])
+			}
+
+			value[indLeft], value[indRight] = value[indRight], value[indLeft]
+		case "reverse":
+			indLeft, _ := strconv.Atoi(parts[2])
+			indRight, _ := strconv.Atoi(parts[4])
+			for indLeft < indRight {
+				value[indLeft], value[indRight] = value[indRight], value[indLeft]
+				indLeft++
+				indRight--
+			}
+		case "rotate":
+			ind := 0
+			switch parts[1] {
+			case "left":
+				ind, _ = strconv.Atoi(parts[2])
+				ind = len(value) - ind // reverse
+			case "right":
+				ind, _ = strconv.Atoi(parts[2])
+				// reverse
+			case "based":
+					ind = slices.Index(value, parts[6])
+					ind = (len(value) + ind - rotates[ind]) % len(value) // reverse
+			}
+			value = append(value[ind:], value[:ind]...)
+		case "move":
+			indLeft, _ := strconv.Atoi(parts[2])
+			indRight, _ := strconv.Atoi(parts[5])
+			dir := -1 // reverse
+			if indLeft > indRight {
+				dir = 1
+			}
+			l := value[indRight]
+			for ; indLeft != indRight; indRight += dir {
+				value[indRight] = value[indRight+dir]
+			}
+			value[indRight] = l
+		}
+		fmt.Printf("%s: %s\n", line, strings.Join(value, ""))
+	}
+	return strings.Join(value, "")
 }
