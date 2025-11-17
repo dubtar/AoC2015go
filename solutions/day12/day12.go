@@ -73,6 +73,8 @@ func (c *Computer) Step() {
 		c.Set(ops[1], c.Get(ops[1]) + c.Get(ops[2]))
 	case "mul":
 		c.Set(ops[1], c.Get(ops[2]) * c.Get(ops[3]))
+	case "addmul":
+		c.Set(ops[1], c.Get(ops[1]) + (c.Get(ops[2]) * c.Get(ops[3])))
 	}
 
 	c.pos++
