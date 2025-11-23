@@ -86,6 +86,39 @@ func Combinations[T any](set []T) (subsets [][]T) {
 	return subsets
 }
 
+func Permutations[T any](set []T) (subsets [][]T) {
+	// Source - https://stackoverflow.com/a/30226442
+	// Posted by Salvador Dali
+	// Retrieved 2025-11-23, License - CC BY-SA 3.0
+
+	var helper func([]T, int)
+	res := [][]T{}
+
+	helper = func(arr []T, n int) {
+		if n == 1 {
+			tmp := make([]T, len(arr))
+			copy(tmp, arr)
+			res = append(res, tmp)
+			return
+		}
+		for i := range n {
+			helper(arr, n-1)
+			if n%2 == 1 {
+				tmp := arr[i]
+				arr[i] = arr[n-1]
+				arr[n-1] = tmp
+			} else {
+				tmp := arr[0]
+				arr[0] = arr[n-1]
+				arr[n-1] = tmp
+			}
+		}
+	}
+	helper(set, len(set))
+	return res
+
+}
+
 func Multiply[T int | int64](list []T) T {
 	res := T(1)
 	for _, e := range list {
